@@ -78,14 +78,24 @@ export function BookSearch() {
             )}
             <CardContent>
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Book className="h-4 w-4 text-gray-500" />
                   <span className="text-sm text-gray-600">ISBN: {book.isbn}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">{book.category}</Badge>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 break-words whitespace-normal max-w-full"
+                  >
+                    {book.category}
+                  </Badge>
                   {book.description && (
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">{book.description}</Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-800 break-words whitespace-normal max-w-full"
+                    >
+                      {book.description}
+                    </Badge>
                   )}
                 </div>
               </div>
