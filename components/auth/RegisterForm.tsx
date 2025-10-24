@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 
 import Link from 'next/link'
 import React, { useState, useTransition, useCallback, useMemo } from 'react'
@@ -8,7 +8,10 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children?: React.ReactNode
 }
 const ButtonComponent = ({ children, className, ...props }: ButtonProps) => (
-  <button {...props} className={`rounded-lg font-semibold transition-all ${className}`}>
+  <button
+    {...props}
+    className={`rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 ${className}`}
+  >
     {children}
   </button>
 )
@@ -16,7 +19,10 @@ export const Button = React.memo(ButtonComponent)
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 const InputComponent = (props: InputProps) => (
-  <input {...props} className={`w-full rounded-lg px-4 py-3 border placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${props.className}`} />
+  <input
+    {...props}
+    className={`w-full rounded-xl px-4 py-3 border border-gray-300 bg-white/60 backdrop-blur-md placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${props.className}`}
+  />
 )
 export const Input = React.memo(InputComponent)
 
@@ -38,7 +44,7 @@ const SelectComponent = ({ value, onValueChange, options, className }: SelectPro
   <select
     value={value}
     onChange={(e) => onValueChange(e.target.value)}
-    className={`w-full rounded-lg px-4 py-3 border text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${className}`}
+    className={`w-full rounded-xl px-4 py-3 border border-gray-300 bg-white/60 backdrop-blur-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${className}`}
   >
     {options.map((opt) => (
       <option key={opt.value} value={opt.value}>
@@ -55,7 +61,6 @@ export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  // stable handlers to prevent unnecessary re-renders in memoized children
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setFormData((prev) => ({ ...prev, [id]: value }))
@@ -68,7 +73,6 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
@@ -76,9 +80,7 @@ export default function RegisterForm() {
         body: JSON.stringify(formData),
         cache: 'no-store',
       })
-
       if (!res.ok) throw new Error('Failed to register')
-
       const data = await res.json()
       startTransition(() => {
         router.push(data.user.role === 'USER' ? '/user/dashboard' : '/librarian/dashboard')
@@ -90,17 +92,19 @@ export default function RegisterForm() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-200 px-4 sm:px-6">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white border border-gray-200 rounded-3xl p-10 shadow-lg space-y-6"
+        className="w-full max-w-lg bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl p-10 shadow-2xl space-y-6"
       >
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-1">Create Your Account</h2>
-          <p className="text-sm text-gray-500">Join LibraryMS to manage your books smartly.</p>
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-1 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Create Your Account
+          </h2>
+          <p className="text-sm text-gray-600">Join <span className="font-semibold text-blue-600">LibraryMS</span> to manage your books smartly.</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
             <Label htmlFor="name">Full Name</Label>
             <Input id="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required autoComplete="name" />
@@ -119,32 +123,36 @@ export default function RegisterForm() {
           <div>
             <Label htmlFor="role">Role</Label>
             <Select
-                value={formData.role}
-                onValueChange={onRoleChange}
-                options={useMemo(
-                  () => [
-                    { value: 'USER', label: 'Student' },
-                    { value: 'LIBRARIAN', label: 'Librarian' },
-                  ],
-                  []
-                )}
+              value={formData.role}
+              onValueChange={onRoleChange}
+              options={useMemo(
+                () => [
+                  { value: 'USER', label: 'Student' },
+                  { value: 'LIBRARIAN', label: 'Librarian' },
+                ],
+                []
+              )}
             />
           </div>
         </div>
 
-        {error && <p className="text-red-500 text-sm text-center animate-pulse">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm text-center animate-pulse font-medium">
+            {error}
+          </p>
+        )}
 
         <Button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-lg shadow-lg rounded-xl"
           disabled={isPending}
         >
           {isPending ? 'Creating Account…' : 'Create Account'}
         </Button>
 
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/auth/login" className="text-blue-600 hover:text-indigo-600 font-medium underline underline-offset-2">
             Log in
           </Link>
         </p>
